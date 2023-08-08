@@ -11,16 +11,15 @@ cod="\033[0m"
 o="\033[91m"
 grn="\033[92m"
 blu="\033[34m"
-msf="6.0.27"
 mob=$(uname -o)
 arc=$(dpkg --print-architecture)
-str=$(du -hs)
+#str=$(du -hs)
 krn=$(uname -s)
 ip=$(curl -s https://api.ipify.org)
-AVL=`df -h /storage/emulated | awk '{ print $4 }' | tail -1`
+#AVL=`df -h /storage/emulated | awk '{ print $4 }' | tail -1`
 echo -e "
  ╭━━━━━━━━━━━━━╮
- ┃━━━━$blu●$grn━══━━━━━┃ $grn$cod STORAGE=$o"$AVL"$grn
+ ┃━━━━$blu●$grn━══━━━━━┃ $grn$cod STORAGE=$o"STRG"$grn
  ┃SUBSCRIBE    ┃ $grn$cod ARCHITECTURE=$o"$arc"$grn
  ┃LIKE         ┃ $grn$cod OS=$o"$mob"$grn
  ┃SHARE        ┃ $grn$cod KERNEL=$o"$krn"$grn
@@ -36,6 +35,7 @@ echo -e "
  ╰━━━━━━━━━━━━━╯ $blu INSTALLATION MAY TAKE ($o 40 MINUTES$blu)$grn
 "
 sleep 5.0
+cd $HOME
 if [ -d $HOME/metasploit-framework ];
 then
 center "CHEKING OLD METASPLOIT"
@@ -47,82 +47,93 @@ sleep 4.0
 else
 echo
 fi
-if [[ $arc = "arm" ]];
-then
-echo -e "\033[92m"
-center "INSTALLING REQUIREED PACKAGES"
-echo -e "\e[34mPACKAGES BEING INSTALLED WAIT....\e[0m"
-apt remove -y ruby >/dev/null 2>&1
-apt install -y libiconv zlib autoconf bison clang coreutils curl findutils git apr apr-util libffi libgmp libpcap postgresql readline libsqlite openssl libtool libxml2 libxslt ncurses pkg-config wget make libgrpc termux-tools ncurses-utils ncurses unzip zip tar termux-elf-cleaner > /dev/null 2>&1
+
+pkg install -y binutils python autoconf bison clang coreutils curl findutils apr apr-util postgresql openssl readline libffi libgmp libpcap libsqlite libgrpc libtool libxml2 libxslt ncurses make ncurses-utils ncurses git wget unzip zip tar termux-tools termux-elf-cleaner pkg-config git ruby -o Dpkg::Options::="--force-confnew"
+
+python3 -m pip install --upgrade pip
+
+python3 -m pip install requests
+
+cd $HOME
+
+git clone https://github.com/rapid7/metasploit-framework.git --depth=1
+
+cd $HOME/metasploit-framework
+
+gem install bundler
+
+cd $HOME/metasploit-framework
+
+declare NOKOGIRI_VERSION=$(cat Gemfile.lock | grep -i nokogiri | sed 's/nokogiri [\(\)]/(/g' | cut -d ' ' -f 5 | grep -oP "(.).[[:digit:]][\w+]?[.].")
+
+cd $HOME/metasploit-framework
+
+gem install nokogiri -v $NOKOGIRI_VERSION -- --use-system-libraries
+
+cd $HOME/metasploit-framework
+
+bundle config build.nokogiri "--use-system-libraries --with-xml2-include=$PREFIX/include/libxml2"; bundle install
+
+cd $HOME/metasploit-framework
+
+gem install actionpack
+
+cd $HOME/metasploit-framework
+
+bundle update activesupport
+
+cd $HOME/metasploit-framework
+
+bundle update --bundler
+
+cd $HOME/metasploit-framework
+
+bundle install -j$(nproc --all)
+
+cd $HOME/metasploit-framework
+
+###################################################
+sleep 10
+gem install bundler
+sleep 10
+declare NOKOGIRI_VERSION=$(cat Gemfile.lock | grep -i nokogiri | sed 's/nokogiri [\(\)]/(/g' | cut -d ' ' -f 5 | grep -oP "(.).[[:digit:]][\w+]?[.].")
+sleep 10
+gem install nokogiri -v $NOKOGIRI_VERSION -- --use-system-libraries
+sleep 10
+bundle config build.nokogiri "--use-system-libraries --with-xml2-include=$PREFIX/include/libxml2"; bundle install
+sleep 10
+gem install actionpack
+sleep 10
+bundle update activesupport
+sleep 10
+bundle update --bundler
+sleep 10
+bundle install -j$(nproc --all)
+sleep 10
+###################################################
+
 echo -e "\e[34mPACKAGES INSTALLED SUCCESSFULLY....[\e[92m✓\e[34m]\e[0m"
 echo -e "\033[92m"
 center "INSTALLING  METASPLOIT"
 echo -e "\e[34mINSTALLING METASPLOIT....\e[0m"
+
+#######################################################
+
 cd $HOME
-ln -sf $PREFIX/include/libxml2/libxml $PREFIX/include/
-loc='/data/data/com.termux/files/home'
-ver='6.0.27'
-cd $loc
-apt-mark unhold ruby >/dev/null 2>&1
-curl -LO https://github.com/rapid7/metasploit-framework/archive/$ver.tar.gz >/dev/null 2>&1
-cd $loc
-tar -xf $ver.tar.gz >/dev/null 2>&1
-mv $loc/metasploit-framework-$ver $loc/metasploit-framework >/dev/null 2>&1
-cd $loc/m-wiz/core/rb/arm
-cp ruby.deb $loc >/dev/null 2>&1
-cd $loc
-apt install -y ./ruby.deb >/dev/null 2>&1
-apt-mark hold ruby >/dev/null 2>&1
-cd $loc/metasploit-framework 
-bundle config build.nokogiri --use-system-libraries >/dev/null 2>&1
-bundle update >/dev/null 2>&1
-elif [[ $arc = "aarch64" ]];
-then
-center "INSTALLING REQUIREED PACKAGES"
-echo -e "\e[34mPACKAGES BEING INSTALLED WAIT....\e[0m"
-apt remove -y ruby >/dev/null 2>&1
-apt install -y libiconv zlib autoconf bison clang coreutils curl findutils git apr apr-util libffi libgmp libpcap postgresql readline libsqlite openssl libtool libxml2 libxslt ncurses pkg-config wget make libgrpc termux-tools ncurses-utils ncurses unzip zip tar termux-elf-cleaner > /dev/null 2>&1
-echo -e "\e[34mPACKAGES INSTALLED SUCCESSFULLY....[\e[92m✓\e[34m]\e[0m"
-echo -e "\033[92m"
-center "INSTALLING  METASPLOIT"
-echo -e "\e[34mINSTALLING METASPLOIT....\e[0m"
-cd $HOME
-ln -sf $PREFIX/include/libxml2/libxml $PREFIX/include/
-loc='/data/data/com.termux/files/home'
-ver='6.0.27'
-cd $loc
-apt-mark unhold ruby >/dev/null 2>&1
-curl -LO https://github.com/rapid7/metasploit-framework/archive/$ver.tar.gz >/dev/null 2>&1
-cd $loc
-tar -xf $ver.tar.gz >/dev/null 2>&1
-mv $loc/metasploit-framework-$ver $loc/metasploit-framework >/dev/null 2>&1
-cd $loc/m-wiz/core/rb/aarch64
-cp ruby.deb $loc >/dev/null 2>&1
-cd $loc
-apt install -y ./ruby.deb >/dev/null 2>&1
-apt-mark hold ruby >/dev/null 2>&1
-cd $loc/metasploit-framework 
-bundle config build.nokogiri --use-system-libraries >/dev/null 2>&1
-bundle update >/dev/null 2>&1
-else
-echo
-fi
-wget https://github.com/termux/termux-packages/files/2912002/fix-ruby-bigdecimal.sh.txt >/dev/null 2>&1
-bash fix-ruby-bigdecimal.sh.txt >/dev/null 2>&1
-cd $loc
+
 mkdir -p $PREFIX/var/lib/postgresql >/dev/null 2>&1
+
 initdb $PREFIX/var/lib/postgresql  >/dev/null 2>&1
+
 echo -e "\e[34mMETASPLOIT \e[92m$ver\e[34m INSTALLED SUCCESSFULLY....[\e[92m✓\e[34m]\e[92m"
 center "COMPLETING ALL PROCESS"
-cd $loc
 echo -e "\e[34mCOMPLETING WAIT.....\e[0m"
-rm $ver.tar.gz >/dev/null 2>&1
-rm ruby.deb >/dev/null 2>&1
 echo -e "\e[34mCOMPLETED SUCCESSFULLY....[\e[92m✓\e[34m]\e[92m"
 center "STARTING METASPLOIT"
 echo -e "\e[34mBOOTING UP WAIT.....\e[0m"
 echo -e "\e[34mTO START METASPLOIT TYPE (./msfconsole) INSIDE METASPLOIT FRAMEWORK\e[0m"
 sleep 8.0
-cd $loc/metasploit-framework
-clear
+
+cd $HOME/metasploit-framework
+#bundle install --gemfile /data/data/com.termux/files/home/metasploit-framework/Gemfile
 ./msfconsole
